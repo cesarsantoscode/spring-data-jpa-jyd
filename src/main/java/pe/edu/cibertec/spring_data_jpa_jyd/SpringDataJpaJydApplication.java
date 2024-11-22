@@ -7,6 +7,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import pe.edu.cibertec.spring_data_jpa_jyd.entity.Customer;
 import pe.edu.cibertec.spring_data_jpa_jyd.repository.CustomerRepository;
 
+import javax.naming.InitialContext;
+import javax.sql.DataSource;
+import java.sql.Connection;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -178,13 +181,12 @@ public class SpringDataJpaJydApplication implements CommandLineRunner {
         /**
          * find() - map()
          */
-        Optional<Customer> optional = customerRepository.findById(623);
+        Optional<Customer> optional = customerRepository.findById(617);
         String email = optional.map(Customer::getEmail).orElseGet(() -> {
             System.out.println("Customer not found");
             return "No-email";
         });
         System.out.println(email);
-
 
     }
 

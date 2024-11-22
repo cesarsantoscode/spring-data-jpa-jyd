@@ -5,7 +5,9 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import pe.edu.cibertec.spring_data_jpa_jyd.entity.Customer;
+import pe.edu.cibertec.spring_data_jpa_jyd.entity.Film;
 import pe.edu.cibertec.spring_data_jpa_jyd.repository.CustomerRepository;
+import pe.edu.cibertec.spring_data_jpa_jyd.repository.FilmRepository;
 
 import javax.naming.InitialContext;
 import javax.sql.DataSource;
@@ -19,6 +21,9 @@ public class SpringDataJpaJydApplication implements CommandLineRunner {
 
     @Autowired
     CustomerRepository customerRepository;
+
+    @Autowired
+    FilmRepository filmRepository;
 
     public static void main(String[] args) {
         SpringApplication.run(SpringDataJpaJydApplication.class, args);
@@ -181,12 +186,59 @@ public class SpringDataJpaJydApplication implements CommandLineRunner {
         /**
          * find() - map()
          */
-        Optional<Customer> optional = customerRepository.findById(617);
-        String email = optional.map(Customer::getEmail).orElseGet(() -> {
-            System.out.println("Customer not found");
-            return "No-email";
+//        Optional<Customer> optional = customerRepository.findById(617);
+//        String email = optional.map(Customer::getEmail).orElseGet(() -> {
+//            System.out.println("Customer not found");
+//            return "No-email";
+//        });
+//        System.out.println(email);
+
+        /**
+         * findAll() - Caching
+         */
+        System.out.println("------------------------------------------------------");
+        System.out.println("findAll() -> 1ra llamada a MySQL");
+        System.out.println("------------------------------------------------------");
+        Iterable<Film> iterable = filmRepository.findAll();
+        iterable.forEach((film) -> {
+            String message = String.format("%s:%s;", film.getFilm_id(), film.getTitle());
+            System.out.print(message);
         });
-        System.out.println(email);
+
+        System.out.println(" ");
+        System.out.println("------------------------------------------------------");
+        System.out.println("findAll() -> 2da llamada a MySQL");
+        System.out.println("------------------------------------------------------");
+        Iterable<Film> iterable2 = filmRepository.findAll();
+        iterable2.forEach((film) -> {
+            String message = String.format("%s:%s;", film.getFilm_id(), film.getTitle());
+            System.out.print(message);
+        });
+
+        System.out.println(" ");
+        System.out.println("------------------------------------------------------");
+        System.out.println("save() -> Update del Film");
+        System.out.println("------------------------------------------------------");
+        Optional<Film> optional = filmRepository.findById(1);
+        optional.ifPresentOrElse(
+                (item) -> {
+                    item.setTitle("DEALPOOL");
+                    filmRepository.save(item);
+                },
+                () -> {
+                    System.out.println("Film not found");
+                }
+        );
+
+        System.out.println(" ");
+        System.out.println("------------------------------------------------------");
+        System.out.println("findAll() -> 3ra llamada a MySQL");
+        System.out.println("------------------------------------------------------");
+        Iterable<Film> iterable3 = filmRepository.findAll();
+        iterable3.forEach((film) -> {
+            String message = String.format("%s:%s;", film.getFilm_id(), film.getTitle());
+            System.out.print(message);
+        });
 
     }
 
